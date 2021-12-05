@@ -1,10 +1,10 @@
-const OnlyMyCryptoFans = artifacts.require("OnlyMyCryptoFans.sol");
+const OnlyMyCryptoFans = artifacts.require("onlyMyCryptoFans.sol");
 
 require("chai")
   .use(require("chai-as-promised"))
   .should();
 
-contract("OnlyMyCryptoFans", ([deployer, author, tipper]) => {
+contract("onlyMyCryptoFans", ([deployer, author, tipper]) => {
   let onlyMyCryptoFans;
 
   before(async () => {
@@ -26,101 +26,102 @@ contract("OnlyMyCryptoFans", ([deployer, author, tipper]) => {
     });
   });
 
-  // describe("images", async () => {
-  //   let result, imageCount;
-  //   const hash = "QmV8cfu6n4NT5xRr2AHdKxFMTZEJrA44qgrBCr739BN9Wb";
+  describe("images", async () => {
+    let result, imageCount;
 
-  //   before(async () => {
-  //     result = await OnlyMyCryptoFans.uploadImage(hash, "Image description", {
-  //       from: author,
-  //     });
-  //     imageCount = await OnlyMyCryptoFans.imageCount();
-  //   });
+    const hash = "QmV8cfu6n4NT5xRr2AHdKxFMTZEJrA44qgrBCr739BN9Wb";
 
-  //   //check event
-  //   it("creates images", async () => {
-  //     // SUCESS
-  //     assert.equal(imageCount, 1);
-  //     const event = result.logs[0].args;
-  //     assert.equal(event.id.toNumber(), imageCount.toNumber(), "id is correct");
-  //     assert.equal(event.hash, hash, "Hash is correct");
-  //     assert.equal(
-  //       event.description,
-  //       "Image description",
-  //       "description is correct"
-  //     );
-  //     assert.equal(event.tipAmount, "0", "tip amount is correct");
-  //     assert.equal(event.author, author, "author is correct");
+    before(async () => {
+      result = await onlyMyCryptoFans.uploadImage(hash, "Image description", {
+        from: author,
+      });
+      imageCount = await onlyMyCryptoFans.imageCount();
+    });
 
-  //     // FAILURE: Image must have hash
-  //     await OnlyMyCryptoFans.uploadImage("", "Image description", {
-  //       from: author,
-  //     }).should.be.rejected;
+    //check event
+    it("creates images", async () => {
+      // SUCESS
+      assert.equal(imageCount, 1);
+      const event = result.logs[0].args;
+      assert.equal(event.id.toNumber(), imageCount.toNumber(), "id is correct");
+      assert.equal(event.hash, hash, "Hash is correct");
+      assert.equal(
+        event.description,
+        "Image description",
+        "description is correct"
+      );
+      assert.equal(event.tipAmount, "0", "tip amount is correct");
+      assert.equal(event.author, author, "author is correct");
 
-  //     // FAILURE: Image must have description
-  //     await OnlyMyCryptoFans.uploadImage("Image hash", "", { from: author })
-  //       .should.be.rejected;
-  //   });
+      // FAILURE: Image must have hash
+      await onlyMyCryptoFans.uploadImage("", "Image description", {
+        from: author,
+      }).should.be.rejected;
 
-  //   //check from Struct
-  //   it("lists images", async () => {
-  //     const image = await OnlyMyCryptoFans.images(imageCount);
-  //     assert.equal(image.id.toNumber(), imageCount.toNumber(), "id is correct");
-  //     assert.equal(image.hash, hash, "Hash is correct");
-  //     assert.equal(
-  //       image.description,
-  //       "Image description",
-  //       "description is correct"
-  //     );
-  //     assert.equal(image.tipAmount, "0", "tip amount is correct");
-  //     assert.equal(image.author, author, "author is correct");
-  //   });
+      // FAILURE: Image must have description
+      await onlyMyCryptoFans.uploadImage("Image hash", "", { from: author })
+        .should.be.rejected;
+    });
 
-  //   it("allows users to tip images", async () => {
-  //     // Track the author balance before purchase
-  //     let oldAuthorBalance;
-  //     oldAuthorBalance = await web3.eth.getBalance(author);
-  //     oldAuthorBalance = new web3.utils.BN(oldAuthorBalance);
+    //check from Struct
+    it("lists images", async () => {
+      const image = await onlyMyCryptoFans.images(imageCount);
+      assert.equal(image.id.toNumber(), imageCount.toNumber(), "id is correct");
+      assert.equal(image.hash, hash, "Hash is correct");
+      assert.equal(
+        image.description,
+        "Image description",
+        "description is correct"
+      );
+      assert.equal(image.tipAmount, "0", "tip amount is correct");
+      assert.equal(image.author, author, "author is correct");
+    });
 
-  //     result = await OnlyMyCryptoFans.tipImageOwner(imageCount, {
-  //       from: tipper,
-  //       value: web3.utils.toWei("1", "Ether"),
-  //     });
+    it("allows users to tip images", async () => {
+      // Track the author balance before purchase
+      let oldAuthorBalance;
+      oldAuthorBalance = await web3.eth.getBalance(author);
+      oldAuthorBalance = new web3.utils.BN(oldAuthorBalance);
+      console.log("imageCount", typeof imageCount);
+      result = await onlyMyCryptoFans.tipImageOwner(imageCount, {
+        from: tipper,
+        value: web3.utils.toWei("1", "Ether"),
+      });
 
-  //     // SUCCESS
-  //     const event = result.logs[0].args;
-  //     assert.equal(event.id.toNumber(), imageCount.toNumber(), "id is correct");
-  //     assert.equal(event.hash, hash, "Hash is correct");
-  //     assert.equal(
-  //       event.description,
-  //       "Image description",
-  //       "description is correct"
-  //     );
-  //     assert.equal(
-  //       event.tipAmount,
-  //       "1000000000000000000",
-  //       "tip amount is correct"
-  //     );
-  //     assert.equal(event.author, author, "author is correct");
+      // SUCCESS
+      const event = result.logs[0].args;
+      assert.equal(event.id.toNumber(), imageCount.toNumber(), "id is correct");
+      assert.equal(event.hash, hash, "Hash is correct");
+      assert.equal(
+        event.description,
+        "Image description",
+        "description is correct"
+      );
+      assert.equal(
+        event.tipAmount,
+        "1000000000000000000",
+        "tip amount is correct"
+      );
+      assert.equal(event.author, author, "author is correct");
 
-  //     // Check that author received funds
-  //     let newAuthorBalance;
-  //     newAuthorBalance = await web3.eth.getBalance(author);
-  //     newAuthorBalance = new web3.utils.BN(newAuthorBalance);
+      // Check that author received funds
+      let newAuthorBalance;
+      newAuthorBalance = await web3.eth.getBalance(author);
+      newAuthorBalance = new web3.utils.BN(newAuthorBalance);
 
-  //     let tipImageOwner;
-  //     tipImageOwner = web3.utils.toWei("1", "Ether");
-  //     tipImageOwner = new web3.utils.BN(tipImageOwner);
+      let tipImageOwner;
+      tipImageOwner = web3.utils.toWei("1", "Ether");
+      tipImageOwner = new web3.utils.BN(tipImageOwner);
 
-  //     const expectedBalance = oldAuthorBalance.add(tipImageOwner);
+      const expectedBalance = oldAuthorBalance.add(tipImageOwner);
 
-  //     assert.equal(newAuthorBalance.toString(), expectedBalance.toString());
+      assert.equal(newAuthorBalance.toString(), expectedBalance.toString());
 
-  //     // FAILURE: Tries to tip a image that does not exist
-  //     await OnlyMyCryptoFans.tipImageOwner(99, {
-  //       from: tipper,
-  //       value: web3.utils.toWei("1", "Ether"),
-  //     }).should.be.rejected;
-  //   });
-  // });
+      // FAILURE: Tries to tip a image that does not exist
+      // await onlyMyCryptoFans.tipImageOwner(99, {
+      //   from: tipper,
+      //   value: web3.utils.toWei("1", "Ether"),
+      // }).should.be.rejected;
+    });
+  });
 });
