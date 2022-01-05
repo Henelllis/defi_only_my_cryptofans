@@ -118,10 +118,10 @@ contract("onlyMyCryptoFans", ([deployer, author, tipper]) => {
       assert.equal(newAuthorBalance.toString(), expectedBalance.toString());
 
       // FAILURE: Tries to tip a image that does not exist
-      // await onlyMyCryptoFans.tipImageOwner(99, {
-      //   from: tipper,
-      //   value: web3.utils.toWei("1", "Ether"),
-      // }).should.be.rejected;
+      await onlyMyCryptoFans.tipImageOwner(99, {
+        from: tipper,
+        value: web3.utils.toWei("1", "Ether"),
+      }).should.be.rejected;
     });
   });
 });
