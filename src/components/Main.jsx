@@ -1,6 +1,9 @@
-import React from "react";
+import Identicon from "identicon.js";
+import React, { useState } from "react";
 
-const Main = ({ captureFile, imageDescription, uploadImage }) => {
+const Main = ({ captureFile, images, tipImageOwner, uploadImage }) => {
+  const [description, setDescription] = useState("");
+
   return (
     <div className="container-fluid mt-5">
       <div className="row">
@@ -15,9 +18,6 @@ const Main = ({ captureFile, imageDescription, uploadImage }) => {
             <form
               onSubmit={(event) => {
                 event.preventDefault();
-                // const description = this.imageDescription.value
-                const description = imageDescription.value;
-                // this.props.uploadImage(description);
                 uploadImage(description);
               }}
             >
@@ -32,8 +32,8 @@ const Main = ({ captureFile, imageDescription, uploadImage }) => {
                 <input
                   id="imageDescription"
                   type="text"
-                  ref={(input) => {
-                    imageDescription = input;
+                  onChange={(event) => {
+                    setDescription(event.target.value);
                   }}
                   className="form-control"
                   placeholder="Image description..."
@@ -50,7 +50,57 @@ const Main = ({ captureFile, imageDescription, uploadImage }) => {
 
             <p>&nbsp;</p>
 
-            {/* Code ... */}
+            {images &&
+              images.map((image, key) => (
+                <div className="card mb-4" key={key}>
+                  <div className="card-header">
+                    <img
+                      className="mr-2"
+                      width="30"
+                      height="30"
+                      src={`data:image/png;base64,${new Identicon(
+                        image.author,
+                        30
+                      ).toString()}`}
+                    />
+                    <small className="text-muted">{image.author}</small>
+                  </div>
+                  <ul id="imageList" className="list-group list-group-flush">
+                    <li className="list-group-item">
+                      <p className="text-center">
+                        <img
+                          src={`https://ipfs.infura.io/ipfs/${image.hash}`}
+                        />
+                      </p>
+                      <p>{image.description}</p>
+                    </li>
+                    <li key={key} className="list-group-item py-2">
+                      <small className="float-left mt-1 text-muted">
+                        TIPS:{" "}
+                        {window.web3.utils.fromWei(
+                          image.tipAmount.toString(),
+                          "ether"
+                        )}{" "}
+                        ETH
+                      </small>
+                      <button
+                        className="btn btn-link btn-sm float-right pt-0"
+                        name={image.id}
+                        onClick={(event) => {
+                          const tipAmount = window.web3.utils.toWei(
+                            "0.1",
+                            "Ether"
+                          );
+                          console.log(event.target.name, tipAmount);
+                          tipImageOwner(event.target.name, tipAmount);
+                        }}
+                      >
+                        TIP 0.1 ETH
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              ))}
           </div>
         </main>
       </div>

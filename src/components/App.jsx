@@ -45,6 +45,16 @@ const App = () => {
         .imageCount()
         .call();
       setImageCount(imageCount);
+      console.log("imageCount", imageCount);
+      const imageCollection = [];
+      for (let i = 1; i <= imageCount; i++) {
+        const image = await onlyMyCryptoFansContract.methods.images(i).call();
+        console.log("image", image);
+        imageCollection.push(image);
+        console.log("setImages ", setImages);
+      }
+      setImages(imageCollection);
+
       setLoading(false);
     } else {
       window.alert(
@@ -76,14 +86,24 @@ const App = () => {
         console.error(error);
         return;
       }
-      // setLoading(true);
-      // onlyMyCryptoFansContract.methods
-      //   .uploadImage(result[0].hash, description)
-      //   .send({ from: account })
-      //   .on("transactionHash", () => {
-      //     setLoading(false);
-      //   });
+      setLoading(true);
+      onlyMyCryptoFansContract.methods
+        .uploadImage(result[0].hash, description)
+        .send({ from: account })
+        .on("transactionHash", () => {
+          setLoading(false);
+        });
     });
+  };
+
+  const tipImageOwner = (id, tipAmount) => {
+    setLoading(true);
+    onlyMyCryptoFansContract.methods
+      .tipImageOwner(id)
+      .send({ from: account, value: tipAmount })
+      .on("transactionHash", (hash) => {
+        setLoading(false);
+      });
   };
 
   useEffect(async () => {
@@ -112,9 +132,9 @@ const App = () => {
       ) : (
         <Main
           captureFile={captureFile}
-          imageDescription={{ value: "ehrny" }}
           uploadImage={uploadImage}
-          // Code...
+          images={images}
+          tipImageOwner={tipImageOwner}
         />
       )}
     </div>
